@@ -1,0 +1,56 @@
+@import './variable.less';
+
+.aside {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  margin-top: @header-hei;
+  width: @aside-expanded-wid;
+  transition: width .2s cubic-bezier(.25, 0, .15, 1);
+  background: #fff;
+  overflow: hidden;
+
+  &:after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    border-right: 1px solid @border-color;
+  }
+}
+
+.aside-collapsed .aside {
+  width: @aside-collapsed-wid;
+}
+
+.aside-icon {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  line-height: 40px;
+  font-size: 20px;
+  border-top: 1px solid @border-color;
+  cursor: pointer;
+}
+
+.ant-menu-submenu-title,
+.ant-menu-item {
+  margin: 0!important;
+  text-align: left;
+}
+
+.ant-menu-submenu-title {
+  padding-left: 24px;
+}
+
+.ant-menu-item {
+  padding-left: 48px;
+}
+
+.ant-menu-inline-collapsed{
+  width: @aside-collapsed-wid;
+  .ant-menu-submenu-title{
+    padding: 0 24px!important;
+  }
+}
