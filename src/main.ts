@@ -7,7 +7,7 @@ import storage from './utils/storage'
 import http from './utils/http'
 
 import { Layout, Form, Tabs, Button, Alert, Input, Icon, Dropdown, Menu, message, Card, Row, Col, Select, Table,
-         Drawer, Modal, Popover, Radio, Spin} from 'ant-design-vue'
+         Drawer, Modal, Popover, Radio, Spin, Checkbox, Dropdown} from 'ant-design-vue'
 
 import 'ant-design-vue/lib/layout/style'
 import 'ant-design-vue/lib/form/style'
@@ -29,6 +29,8 @@ import 'ant-design-vue/lib/modal/style'
 import 'ant-design-vue/lib/popover/style'
 import 'ant-design-vue/lib/radio/style'
 import 'ant-design-vue/lib/spin/style'
+import 'ant-design-vue/lib/checkbox/style'
+import 'ant-design-vue/lib/dropdown/style'
 
 import './directive/docTitleDirective'
 
@@ -51,6 +53,8 @@ Vue.use(Modal)
 Vue.use(Popover)
 Vue.use(Radio)
 Vue.use(Spin)
+Vue.use(Checkbox)
+Vue.use(Dropdown)
 
 Vue.prototype.$http = http;
 Vue.prototype.$ls = storage.ls;

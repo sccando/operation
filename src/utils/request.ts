@@ -28,6 +28,9 @@ httpService.interceptors.request.use(
       message.error('请勿重复调用')
       return
     }
+    if(config.method != 'get' && !config.data.sid){
+      config.data.sid = localStorage.getItem('sid_str')
+    }
     config.headers = {
       webver: webVersion,
       qid: randomString(32)

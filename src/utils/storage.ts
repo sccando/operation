@@ -18,16 +18,20 @@ const storage = {
           return null
         }
       case 'set':
-        storage.ls('clean', name, '');
+        storage.ls('clear', name, '');
         if(typeof obj == 'object'){
           localStorage.setItem(name + '_obj', JSON.stringify(obj))
         }else{
           localStorage.setItem(name + '_str', obj)
         }
         return true;
-      case 'clean':
-        localStorage.removeItem(name + '_obj');
-        localStorage.removeItem(name + '_str')
+      case 'clear':
+        if(name){
+          localStorage.removeItem(name + '_obj');
+          localStorage.removeItem(name + '_str')
+        }else{
+          localStorage.clear()
+        }
         return true;
     }
   },
@@ -44,16 +48,20 @@ const storage = {
           return null
         }
       case 'set':
-        storage.ss('clean', name, '');
+        storage.ss('clear', name, '');
         if(typeof obj == 'object'){
           sessionStorage.setItem(name + '_obj', JSON.stringify(obj))
         }else{
           sessionStorage.setItem(name + '_str', obj)
         }
         return true;
-      case 'clean':
-        sessionStorage.removeItem(name + '_obj');
-        sessionStorage.removeItem(name + '_str')
+      case 'clear':
+        if(name){
+          sessionStorage.removeItem(name + '_obj');
+          sessionStorage.removeItem(name + '_str')
+        }else{
+          sessionStorage.clear()
+        }
         return true;
     }
   }

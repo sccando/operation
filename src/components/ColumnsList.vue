@@ -123,7 +123,6 @@ export default class columnsList extends Vue {
 
     private getColumnList(e: any) {
             let data = {
-                "sid": store.state.userInfo.sid,
                 "columns": {
                     "tid": 301, //列表Id（INTEGER NOT NULL）
                 }
@@ -209,7 +208,6 @@ export default class columnsList extends Vue {
         this.checkOptionsOne = JSON.parse(JSON.stringify(list));
         let cols = this.reverseFormatColSet(this.checkOptionsOne);
         let param ={
-                sid:store.state.userInfo.sid,
                 columns: {
                     "tid": 301, //列表Id（INTEGER NOT NULL）
                     "columns": cols

@@ -1,7 +1,9 @@
 import store from '@/store/store'
 
 export function permissionGuard(pk: string): boolean{
-  let perms = store.state.userInfo.perms;
+  let perms;
+  let storePerms = store.state.perms;
+  perms = storePerms.length ? storePerms : JSON.parse(localStorage.getItem('perms_obj'));
   let bool = false;
   if(perms && perms.length){
     perms.forEach((item:any) => {

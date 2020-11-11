@@ -18,7 +18,7 @@ const router = new Router({
 
 // 全局路由守卫
 router.beforeEach((to, from, next) => {
-  const sid = store.state.userInfo.sid;
+  const sid = localStorage.getItem('sid_str');
   // 有权限无sid或无权限跳转到登录页
   if((sid && to.meta && permissionGuard(to.meta.routerGuard)) || to.name === '/passport/login'){
     next()

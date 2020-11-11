@@ -86,7 +86,6 @@ export default class Login extends Vue {
 
   handleLoginSubmit(e: any) {
     e.preventDefault();
-    let that = this;
     this.loginForm.validateFields((err: any, values: any) => {
       if (!err) {
         let data = {
@@ -100,12 +99,11 @@ export default class Login extends Vue {
         this.$http.post("pri/system/login", data).then((res:any) => {
           if(res){
             const resData = res.data;
-            const userInfo = {
-              sid: resData.sid,
-              name: resData.name,
-              perms: resData.perms
-            }
-            store.commit('storeUser', userInfo)
+            this.$ls('set', 'sid', resData.sid);
+            this.$ls('set', 'name', resData.name);
+            this.$ls('set', 'perms', resData.perms);
+
+            this.$store.commit('getPerms', resData.perms)
 
             this.$router.push("/").catch(data => {
               console.log(data);

@@ -4,28 +4,14 @@
       <a-button slot="extra" type="primary" @click="exportFun" ghost v-if="isExport">导出</a-button>
       <a-form class="ant-advanced-search-form">
         <a-row :gutter="24">
-          <a-col :span="6">
-            <a-form-item label="对接人" :label-col="{span: 5}">
-              <a-select v-model="salesValue" placeholder="请选择对接人" :allowClear="true" @change="selectFun('sales',$event)">
-                <a-select-option v-for="i in salesList" :key="i.sukey">{{ i.name }}</a-select-option>
+          <a-col :span="6" v-for="(filterKey,ind) in filterCondition" :key="ind">
+            <a-form-item :label="filterKey.label" :label-col="{span: 5}">
+              <a-select :defaultValue="99999" placeholder="请选择" :allowClear="true" show-search @change="selectFun(filterKey.key,$event)">
+                <a-select-option v-for="i in filterKey.list" :key="i.value">{{ i.display }}</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
 
-          <a-col :span="6">
-            <a-form-item label="健康度状态" :label-col="{span: 5}">
-              <a-select v-model="statusValue" placeholder="请选择健康度状态" :allowClear="true" @change="selectFun('status',$event)">
-                <a-select-option v-for="i in status" :key="i.value">{{ i.name }}</a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col :span="6">
-            <a-form-item label="实施量级" :label-col="{span: 5}">
-              <a-select placeholder="请选择实施量级" v-model="install_scaleValue" :allowClear="true" @change="selectFun('install_scale',$event)">
-                <a-select-option v-for="i in install_scale" :key="i.value">{{ i.name }}</a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
           <a-col :span="6">
             <a-form-item label="所属渠道" :label-col="{span: 5}">
               <a-select placeholder="请选择所属渠道" show-search v-model="defaultValue1" @change="selectFun('pcid',$event)">
@@ -46,23 +32,29 @@
 
           <a-col :span="6">
             <a-form-item label="项目名称" :label-col="{span: 5}">
-              <a-input-search placeholder="请输入项目名称" v-model="pnameValue" @search="onSearchFun('pname',$event)"/>
+              <a-input-search placeholder="请输入项目名称" v-model="pnameValue" @search="selectFun('pname',$event)"/>
             </a-form-item>
           </a-col>
           <a-col :span="6">
-            <div class="filter-item" id="col-set">
+            <a-dropdown>
+              <a-menu>
+                <a-menu-item>
+                  <columns-list @onColumnsClick="columnsClickSuccess" :tid="'101'" :selectCol="selectColBoolean" />
+                </a-menu-item>
+              </a-menu>
+              <a-button>
+                列配置
+                <a-icon :type="selectColBoolean ? 'up' : 'down'" />
+              </a-button>
+            </a-dropdown>
+            <!-- <div class="filter-item" id="col-set">
               <div class="filter-common column-set" :class="{'is-selected':selectColBoolean}">
-                <!-- <div @click="selectColBoolean=!selectColBoolean;">
+                <div @click="selectColBoolean=!selectColBoolean;">
                   <p>列配置</p>
                   <img :class="{'rotate_arrow':selectColBoolean}" src="../../assets/images/icons/icon-down-arrow.svg">
-                </div> -->
-                <a-button @click="selectColBoolean=!selectColBoolean;">
-                  列配置
-                  <a-icon :type="selectColBoolean ? 'up' : 'down'" />
-                </a-button>
-                <columns-list @onColumnsClick="columnsClickSuccess" :tid="'101'" :selectCol="selectColBoolean" />
+                </div>
               </div>
-            </div>
+            </div> -->
           </a-col>
         </a-row>
       </a-form>
@@ -107,7 +99,7 @@
               <div v-if="!isSales">{{text}}</div>
               <div v-else class="flex flex-between" @mouseenter="rowTbHover(record, 'isShowSale', 'hoverSale', 'hoverFollow')">
                 <div>{{text}}</div>
-                <div v-if="record.sales != '——' && hoverSale == record.pkey">
+                <div v-if="hoverSale == record.pkey">
                   <a-popover trigger="click" placement="bottomRight" v-model="isShowSale" @click="clickPop(text)">
                     <template slot="content">
                       <a-select style="width: 100px" v-model="saleAfterKey">
@@ -207,7 +199,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { permissionGuard } from '@/utils/permissionGuard';
-import * as tableConst from '@/model/_constent';
+import * as tableConst from '@/model/analysisModel';
 import ColumnsList from '@/components/ColumnsList.vue'
 import store from '@/store/store'
 
@@ -267,10 +259,16 @@ export default class Analysis extends Vue {
 
   defaultValue1: any = 99999;
   defaultValue2: any = 99999;
-  salesValue: any;
-  statusValue: any = 99999;
-  install_scaleValue: any = 99999;
   pnameValue: any = null;
+  filterCondition: any[] = [];
+  listParam: any = {
+    pcid: null, //渠道商ID
+    cid: null, //客户ID
+    pname: null, //项目名称
+    sukey: null,//对接人
+    status: null, //健康度状态
+    install_scale: null,//实施量级
+  }
 
   constructor() {
     super();
@@ -278,11 +276,9 @@ export default class Analysis extends Vue {
     this.isFollow = permissionGuard('db51de8754e04490a1d98c41b9349802');
     this.isSales = permissionGuard('c484a0d5011d48539d54de60db29bb1f');
     this.progressState = tableConst.progressState;
-    this.salesList = tableConst.salesList;
-    this.install_scale = tableConst.installScale;
     this.columns1 = tableConst.anomalyIndex;
     this.columns2 = tableConst.scoreDetail;
-    this.status = tableConst.healtStatus;
+    this.filterCondition = tableConst.filterCondition;
   }
 
   mounted(){
@@ -310,7 +306,6 @@ export default class Analysis extends Vue {
   }
   getHttpinfo(pkey:string) {
     let param = {
-      sid: store.state.userInfo.sid,
       project_health: {
         pkey: pkey, //项目key
         time: this.headerTime.replace(/\//g, "-").split(" ")[0] //报表创建日期
@@ -366,7 +361,6 @@ export default class Analysis extends Vue {
     let ind = this.salesList.findIndex(sale => sale.sukey == this.saleAfterKey);
     let val = this.salesList[ind].name;
     let param = {
-      sid: store.state.userInfo.sid,
       company: {
         id: item.companyId,
         sukey: this.saleAfterKey,
@@ -407,7 +401,6 @@ export default class Analysis extends Vue {
   followChange(item:any){
     this.popCancel('isShowFollow');
     let param = {
-      sid: store.state.userInfo.sid,
       proj: {
         key: item.pkey,
         pstate: this.checkedFollow
@@ -475,29 +468,13 @@ export default class Analysis extends Vue {
     this.hoverFollow = '';
     this.hoverSale = '';
     this.$store.commit('isLoading', true);
-    // let sale = '';
-    // if(this.salesValue){
-    //   let ind = this.salesList.findIndex(item => item.sukey == this.salesValue)
-    //   sale = this.salesList[ind].name
-    // }
     let param = {
-      sid: store.state.userInfo.sid,
-      project_health: {
-        pcid: this.defaultValue1 == 99999 ? "" : this.defaultValue1, //渠道商ID（Integer）
-        cid: this.defaultValue2 == 99999 ? "" : this.defaultValue2, //客户ID（Integer）
-        pname: this.pnameValue ? (this.pnameValue + "").trim() : null, //项目名称（String）
-        // sales: sale, //对接人（String）
-        sukey: this.salesValue || null,
-        status: this.statusValue == 99999 ? "" : this.statusValue, //健康度状态（Integer）（0：合格（有评分），1：不合格，2：空项目，3：全部解绑）
-        install_scale:
-          this.install_scaleValue == 99999 ? "" : this.install_scaleValue //实施量级（Integer）（0：空，10：送样，20：试点，30：微型，40：小型，50：中型，60：大型）
-      },
+      project_health: this.listParam,
       sort: {
         ranc: "score",
         ranw: "asc"
       }
     };
-    // if(type) param.project_health[type] = value == 99999?null:value;
     if (sort) {
       param.sort.ranw = sort;
       param.sort.ranc = value == 'progressState' ? 'progress_state' : value;
@@ -578,8 +555,9 @@ export default class Analysis extends Vue {
   filterOption(input:any, option:any) {
     return option.componentOptions.children[0].text.indexOf(input) >= 0;
   }
-  // 健康度状态、实施量级、所属渠道、所属客户筛选操作
+  // 筛选操作
   selectFun(type:any, e:any) {
+    this.listParam[type] = e == 99999 ? null : e;
     if (type == "pcid" && e != null) {
       this.pcidList = [];
       this.client2 = JSON.parse(JSON.stringify(this.client));
@@ -589,10 +567,6 @@ export default class Analysis extends Vue {
       this.client = this.pcidList;
       this.defaultValue2 = "";
     }
-    this.getHttpList(type, e);
-  }
-  // 对接人、项目名称搜索操作
-  onSearchFun(type:any, e:any) {
     this.getHttpList(type, e);
   }
   // 列配置修改后的回调
@@ -639,6 +613,21 @@ export default class Analysis extends Vue {
           }
         }
       });
+
+      // 判断列配置与屏幕尺寸
+      let sw = document.documentElement.clientWidth || document.body.clientWidth;
+      let cw = 0;
+      let sidebarWid = document.querySelector('.aside').offsetWidth;
+      this.columns.forEach(item => {
+        cw += item.width;
+      });
+      if(cw <= sw - sidebarWid - 80){
+        this.columns.forEach(item => {
+          delete item.fixed
+        })
+      }
+
+      // 调整跟进状态和项目名称的位置（跟进状态受权限控制展示，无权限但固定时会影响表格展示）
       let ind1 = this.columns.findIndex(item => item.key == 'progressState')
       let ind2 = this.columns.findIndex(item => item.key == 'pname')
       if(ind1 > -1 && ind2 > -1) this.swapArr(this.columns, 1, 2)
@@ -661,7 +650,6 @@ export default class Analysis extends Vue {
   // 导出报表
   exportFun() {
     let param = {
-      sid: store.state.userInfo.sid,
       project_health: this.paramObj.project_health,
       sort: this.paramObj.sort,
       columns: {

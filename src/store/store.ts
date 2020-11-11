@@ -6,11 +6,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     appName: '运营中心',
-    userInfo: {
-      sid: '',
-      name: '',
-      perms: []
-    },//用户信息
+    perms: [],
     isCollapse: false,//菜单折叠
     doctitle: {
       title: ''
@@ -29,10 +25,8 @@ export default new Vuex.Store({
         ...titleInfo,
       }
     },
-    storeUser(state:any, userInfo:any){
-      state.userInfo = {
-        ...userInfo
-      }
+    getPerms(state:any, perms:any){
+      state.perms = perms
     }
   },
   actions: {

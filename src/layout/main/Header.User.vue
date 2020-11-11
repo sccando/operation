@@ -21,7 +21,7 @@ export default class HeaderUser extends Vue {
   userName = "";
   constructor() {
     super();
-    this.userName = store.state.userInfo.name;
+    this.userName = this.$ls('get', 'name');
   }
 
   menuCommand: any = {
@@ -33,17 +33,9 @@ export default class HeaderUser extends Vue {
   }
   // 退出登录
   logout() {
-    let param = {
-      sid: store.state.userInfo.sid
-    };
-    this.$http.post("/pri/system/logout", param).then((res:any) => {
+    this.$http.post("/pri/system/logout", {}).then((res:any) => {
       if(res){
-        let userInfo = {
-          sid: '',
-          name: '',
-          perms: []
-        }
-        store.commit('storeUser', userInfo)
+        this.$ls('clear');
         this.$router.push("/passport/login");
       }
     });
